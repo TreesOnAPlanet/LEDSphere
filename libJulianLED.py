@@ -202,6 +202,9 @@ class JLEDStripe:
         #   print(" ".join(["INFO - JulianLED - setFaster ", str(newFreq), ", factor:" , str(factor)]))
             self._tLessBright = time.perf_counter()
     
+    def getBrightness(self):
+        return self._brightness
+    
     def setColor(self, color = None, color2 = None):
         if color is not None:
             self._color = color

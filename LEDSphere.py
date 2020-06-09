@@ -11,6 +11,7 @@ import libJulianLED
 import PerformanceCounter
 import gamepad
 import RPi.GPIO as GPIO
+import sys
 
 Keypad_PINS = [7,11,13,15,29,31,33,35]
 
@@ -34,35 +35,48 @@ if __name__ == '__main__':
         top_LED = [TOP_LED_0, TOP_LED_1, TOP_LED_2]
         
         strip = libJulianLED.JLEDStripe(LED_count, top_LED, LED_PIN, [50,0,0], [5,5,5])
+        strip.setAutomatic(True)
+        
         GP = gamepad.btGamePad()
+        
         PerfCounter = PerformanceCounter.PerfCounter(correction = 0.002)
         
-        tBTconnection = time.perf_counter()
+        # ~ tBTconnection = time.perf_counter()
+        tCurrentFreq = 0
+        iShutDown = 0
         
-        i = 0
-        while not GP.tryBTconnect():
-            strip.shine(position = i)
-            strip.shine(factor = 0, position = i - 3)
-            strip.lightUp()
-            i += 1
-            time.sleep(1)
+        # ~ i = 0
+        # ~ while (not GP.tryBTconnect()) and (i < 15):
+            # ~ strip.shine(position = i)
+            # ~ strip.shine(factor = 0, position = i - 3)
+            # ~ strip.lightUp()
+            # ~ i += 1
+            # ~ time.sleep(1)
         
-        strip.setColor(color = [50,0,0])
-        strip.changeProgram(2,1)
+        # ~ strip.setColor(color = [50,0,0])
+        # ~ strip.changeProgram(2,1)        
         
         while True:
+            
+            # ~ if time.perf_counter() - tCurrentFreq > 4:
+                # ~ print(" ".join(["INFO - LEDSqhere - current Frequency =", str(strip.getFreq())]))
+                # ~ print(" ".join(["INFO - LEDSqhere - current Brightness =", str(strip.getBrightness())]))
+                # ~ tCurrentFreq = time.perf_counter()
+                
             # update Axis input from controller
-            if GP.updateAxis():
-                # when update was successful -> BT controller is connected
-                # turn automatic off, if automatic was turned on because of inactiveness
-                if time.perf_counter() - tBTconnection > 6000:
-                    strip.setAutomatic(0)
+            GP.updateAxis()
+            
+            # ~ if GP.updateAxis():
+                # ~ # when update was successful -> BT controller is connected
+                # ~ # turn automatic off, if automatic was turned on because of inactiveness
+                # ~ if time.perf_counter() - tBTconnection > 120:
+                    # ~ strip.setAutomatic(0)
                     
-                tBTconnection = time.perf_counter()
-            else:
-                # if BT controller wasn't connected for 2 min change to autmatic mode
-                if time.perf_counter() - tBTconnection > 120:
-                    strip.setAutomatic(1)
+                # ~ tBTconnection = time.perf_counter()
+            # ~ else:
+                # ~ # if BT controller wasn't connected for 2 min change to autmatic mode
+                # ~ if time.perf_counter() - tBTconnection > 120:
+                    # ~ strip.setAutomatic(1)
                 
             # Frequency
             RightJSY = GP.getAxisStatus(5)
@@ -85,6 +99,11 @@ if __name__ == '__main__':
                     # ~ " - Value: " + str(GPinput[2]))
                 if (GPinput[0] >= 0):
                     # print(" ".join(["INFO - LEDSphere - Button pressed ", str(GPinput[1])]))
+                    
+                    if (GPinput[1] == 1):
+                        iShutDown = shutDownCheat(GPinput[0], iShutDown)
+                        if iShutDown == 8:
+                            sys.exit()
                                             
                     if (GPinput[0] == 305) and (GPinput[1] == 1):
                         strip.setColor(color = [200,0,0], color2 = [40,40,40])
@@ -112,7 +131,6 @@ if __name__ == '__main__':
                         strip.changeProgram(4) # change to Obduction
                     
                     
-                    
             strip.nextStep()
             PerfCounter.setTimeStamp()
             
@@ -123,13 +141,27 @@ if __name__ == '__main__':
         strip.lightUp()
         GPIO.cleanup()
         
-    # ~ except:
-        # ~ strip.color = [0,0,0]
-        # ~ strip.shine()
-        # ~ GPIO.cleanup()
-        # ~ print("error =/")
-        
     finally:
         strip.shine(factor = 0)
         strip.lightUp()
         GPIO.cleanup()
+        
+def shutDownCheat(ButtonID,iShutDown = 0):
+    if ButtonID == 305:
+        return 1
+    elif (ButtonID == 304) and (iShutDown == 1):
+        return 2
+    elif (ButtonID == 310) and (iShutDown == 2):
+        return 3
+    elif (ButtonID == 312) and (iShutDown == 3):
+        return 4
+    elif (ButtonID == 311) and (iShutDown == 4):
+        return 5
+    elif (ButtonID == 313) and (iShutDown == 5):
+        return 6
+    elif (ButtonID == 308) and (iShutDown == 6):
+        return 7
+    elif (ButtonID == 307) and (iShutDown == 7):
+        return 8
+    else:
+        return 0
