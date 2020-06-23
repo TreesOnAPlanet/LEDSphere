@@ -5,6 +5,8 @@
 
 from evdev import InputDevice, categorize, ecodes
 
+EVENT_LOC = '/dev/input/event4' # the event of your bluetooth device
+
 class btGamePad():
     def __init__(self):
         self._GP = None
@@ -42,7 +44,7 @@ class btGamePad():
     def tryBTconnect(self):
         if self._GP is None:
             try:
-                self._GP = InputDevice('/dev/input/event4')
+                self._GP = InputDevice(EVENT_LOC)
             except:
                 self._GP = None
            #     print("gamepad - tryBTconnect: No BT controller found")
@@ -55,7 +57,7 @@ class btGamePad():
             
     def tryBTreconnect(self):
         try:
-            self._GP = InputDevice('/dev/input/event4')
+            self._GP = InputDevice(EVENT_LOC)
         except:
             self._GP = None
           #  print("gamepad - tryBTreconnect: No BT controller found")
@@ -90,11 +92,13 @@ class btGamePad():
             if event is not None:
                 #is the event a KeyPress and is the event Code one of the defined Keys?
                 if (event.type == ecodes.EV_KEY) and (event.code in self._keyMatrix):
+                    # ~ print(" ".join(["INFO - GamePad - KeyPress: ", str(event.code), " - ", str(event.value)]))
                     return [event.code, event.value]
                             
                 elif event.type == ecodes.EV_ABS:
                     for i in self._axisMatrix:
                         if (i[0] == event.code) and ((i[0] == 16) or (i[0] == 17)):
+                            # ~ print(" ".join(["INFO - GamePad - KeyPress: ", str(event.code), " - ", str(event.value)]))
                             return [event.code, event.value]
                 else:
                     return [ -4, 0]

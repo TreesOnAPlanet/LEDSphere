@@ -1,1 +1,11 @@
 repo and backup of my LED programs
+
+Sources used:
+Bluetooth controller:
+https://core-electronics.com.au/tutorials/using-usb-and-bluetooth-controllers-with-python.html
+https://www.youtube.com/watch?v=F5-dV6ULeg8
+
+to start it with system start up via systemd:
+https://learn.sparkfun.com/tutorials/how-to-run-a-raspberry-pi-program-on-startup/all#method-3-systemd
+
+current issue: LEDSphere starts around 2min after the boot process is mostly finished. I don't understand why. If you do, help is appreciated ;).

@@ -351,7 +351,7 @@ class JLEDStripe:
         # _phaseObduct, _iObduct, _tObduct
         
         if (self._phaseObduct == 3) and ((time.perf_counter() - self._tObduct) > 1):
-            print("INFO - JulianLED - obduction - it was dark for 1 sec")
+            # ~ print("INFO - JulianLED - obduction - it was dark for 1 sec")
             # after 1 sec of darkness -> start again
             self._phaseObduct = 1
             self._iObduct = 1
@@ -366,7 +366,7 @@ class JLEDStripe:
             self._iObduct += 1
             
             if self._iObduct >= 40:
-                print("INFO - JulianLED - obduction - fizzle finished")
+                # ~ print("INFO - JulianLED - obduction - fizzle finished")
                 self.shine(factor = 0, factor2 = 0)
                 self._phaseObduct = 3
                 
@@ -393,7 +393,7 @@ class JLEDStripe:
                 self._iObduct += 1
                 
                 if self._iObduct >= 70:
-                    print("INFO - JulianLED - obduction - phase 1 finished, let's fizzle")
+                    # ~ print("INFO - JulianLED - obduction - phase 1 finished, let's fizzle")
                     self._phaseObduct = 2
                     self._iObduct = 1         
     

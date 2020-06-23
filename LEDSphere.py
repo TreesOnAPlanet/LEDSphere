@@ -26,6 +26,27 @@ TOP_LED_1      = 0 # highest LED of ring 1
 TOP_LED_2      = 0 # highest LED of ring 2
 
 LED_PIN        = board.D18      # GPIO pin connected to the pixels (18 uses PWM!)
+
+        
+def shutDownCheat(ButtonID,iShutDown = 0):
+    if ButtonID == 305:
+        return 1
+    elif (ButtonID == 304) and (iShutDown == 1):
+        return 2
+    elif (ButtonID == 310) and (iShutDown == 2):
+        return 3
+    elif (ButtonID == 312) and (iShutDown == 3):
+        return 4
+    elif (ButtonID == 311) and (iShutDown == 4):
+        return 5
+    elif (ButtonID == 313) and (iShutDown == 5):
+        return 6
+    elif (ButtonID == 308) and (iShutDown == 6):
+        return 7
+    elif (ButtonID == 307) and (iShutDown == 7):
+        return 8
+    else:
+        return 0
  
 
 if __name__ == '__main__':
@@ -94,11 +115,10 @@ if __name__ == '__main__':
             GPinput = GP.getKey()
             # for some Reason GP.getKey() returns None, when L2 or R2 was pressed
             if GPinput is not None:
-                # ~ print("GamePad: A/K: " + str(GPinput[0]) +
-                    # ~ " - Key: " + str(GPinput[1]) + 
-                    # ~ " - Value: " + str(GPinput[2]))
+                # ~ print("GamePad: event code: " + str(GPinput[0]) +
+                    # ~ " event value: " + str(GPinput[1]))
                 if (GPinput[0] >= 0):
-                    # print(" ".join(["INFO - LEDSphere - Button pressed ", str(GPinput[1])]))
+                    # ~ print(" ".join(["INFO - LEDSphere - Button pressed ", str(GPinput[0])]))
                     
                     if (GPinput[1] == 1):
                         iShutDown = shutDownCheat(GPinput[0], iShutDown)
@@ -145,23 +165,3 @@ if __name__ == '__main__':
         strip.shine(factor = 0)
         strip.lightUp()
         GPIO.cleanup()
-        
-def shutDownCheat(ButtonID,iShutDown = 0):
-    if ButtonID == 305:
-        return 1
-    elif (ButtonID == 304) and (iShutDown == 1):
-        return 2
-    elif (ButtonID == 310) and (iShutDown == 2):
-        return 3
-    elif (ButtonID == 312) and (iShutDown == 3):
-        return 4
-    elif (ButtonID == 311) and (iShutDown == 4):
-        return 5
-    elif (ButtonID == 313) and (iShutDown == 5):
-        return 6
-    elif (ButtonID == 308) and (iShutDown == 6):
-        return 7
-    elif (ButtonID == 307) and (iShutDown == 7):
-        return 8
-    else:
-        return 0
