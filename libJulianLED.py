@@ -98,6 +98,9 @@ class JLEDStripe:
         
         self._resetPrograms()
         
+        # if automatic is active it will change the program now only after 1 program length
+        self._tAutomatic = time.perf_counter() 
+        
         if self._program != number:
             self.setFreq(100)
         
@@ -354,7 +357,7 @@ class JLEDStripe:
             # ~ print("INFO - JulianLED - obduction - it was dark for 1 sec")
             # after 1 sec of darkness -> start again
             self._phaseObduct = 1
-            self._iObduct = 1
+            self._iObduct = 0
             
         elif (self._phaseObduct == 2) and (time.perf_counter() - self._tObduct > 0.05):
             # trail is fizzeling away
@@ -375,13 +378,33 @@ class JLEDStripe:
             deltaTime = 5 / self._freq
             
             if ((time.perf_counter() - self._tObduct) > deltaTime):
+            
+                #
+                # pos_rel(0) = 0
+                # pos_rel(i_max) = 100
+                # option A:
+                # pos_rel(i) = 100 * (i² + 2*i*x0) / (i_max² + 2*i_max*x0)
+                # if x0 gets bigger, the more constant the speed of the obduction
+                #
+                # currently:
+                # i_max = 70
+                # x0 = 10
+                #
+                # option B:
+                # 1.03971^{50+x}-7.008
+                #
                 
-                relativePos = 100*self._iObduct*self._iObduct/(70*70)
+                # pos_rel = 100 * (self._iObduct*self._iObduct + 2*10*self._iObduct) / (4900 + 2*70*10)
+                pos_rel = pow(1.03971,(50 + self._iObduct)) - 7.02
+                print("iObduct: " + str(self._iObduct))
+                print("pos_rel: " + str(pos_rel))
                 
                 for ring in range(3):
                     maxPosHalfRing = int(self._LED_COUNT[ring] / 2) # if the ring is parted in two halves they would be indexed from 0 to maxPosHalfRing
+                                        
+                    position = int(pos_rel*maxPosHalfRing/100)
                     
-                    position = int(relativePos*maxPosHalfRing/100)
+                    print("INFO - JulianLED - obduction - ring" + str(ring) + " pos: " + str(position))
                     
                     self._mirroredPattern(ring, position, inverted = True, factor = 1.0, factor2 = 0.0)
                     if position >= 1:
@@ -389,13 +412,13 @@ class JLEDStripe:
                     if position >= 2:
                         self._mirroredPattern(ring, position - 2, inverted = True, factor = 0.0, factor2 = 0.2)
                 
-                self._tObduct = time.perf_counter() 
-                self._iObduct += 1
-                
                 if self._iObduct >= 70:
                     # ~ print("INFO - JulianLED - obduction - phase 1 finished, let's fizzle")
                     self._phaseObduct = 2
-                    self._iObduct = 1         
+                    self._iObduct = 1
+                
+                self._tObduct = time.perf_counter() 
+                self._iObduct += 1
     
     
     # ~ ~ ~ ~ ~ ~ effects ~ ~ ~ ~ ~ ~
@@ -581,7 +604,7 @@ class JLEDStripe:
         # output:   random LEDs will be turned off
         
         # the number of LEDs that are turned off in one Fizzle Step
-        number = self._LED_COUNT[ring]*5/iterations
+        number = self._LED_COUNT[ring]*4/iterations
         
         for i in range(int(number) - 1):
             position = int(random.random()*self._LED_COUNT[ring])
