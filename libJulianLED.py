@@ -387,24 +387,25 @@ class JLEDStripe:
                 # if x0 gets bigger, the more constant the speed of the obduction
                 #
                 # currently:
-                # i_max = 70
+                # i_max = 100
                 # x0 = 10
                 #
                 # option B:
-                # 1.03971^{50+x}-7.008
+                # 1.0315^{50+x}-4.715
                 #
                 
                 # pos_rel = 100 * (self._iObduct*self._iObduct + 2*10*self._iObduct) / (4900 + 2*70*10)
-                pos_rel = pow(1.03971,(50 + self._iObduct)) - 7.02
-                print("iObduct: " + str(self._iObduct))
-                print("pos_rel: " + str(pos_rel))
+                pos_rel = pow(1.0315,(50 + self._iObduct)) - 4.715
+                # print("iObduct: " + str(self._iObduct))
+                # print("pos_rel: " + str(pos_rel))
                 
                 for ring in range(3):
                     maxPosHalfRing = int(self._LED_COUNT[ring] / 2) # if the ring is parted in two halves they would be indexed from 0 to maxPosHalfRing
                                         
                     position = int(pos_rel*maxPosHalfRing/100)
                     
-                    print("INFO - JulianLED - obduction - ring" + str(ring) + " pos: " + str(position))
+                    # print("INFO - JulianLED - obduction - ring" + str(ring) + " pos: " + str(position))
+                    
                     
                     self._mirroredPattern(ring, position, inverted = True, factor = 1.0, factor2 = 0.0)
                     if position >= 1:
@@ -412,10 +413,11 @@ class JLEDStripe:
                     if position >= 2:
                         self._mirroredPattern(ring, position - 2, inverted = True, factor = 0.0, factor2 = 0.2)
                 
-                if self._iObduct >= 70:
+                if self._iObduct >= 100:
                     # ~ print("INFO - JulianLED - obduction - phase 1 finished, let's fizzle")
                     self._phaseObduct = 2
                     self._iObduct = 1
+                    self.shine(factor = 0.0, factor2 = 0.2)
                 
                 self._tObduct = time.perf_counter() 
                 self._iObduct += 1
