@@ -149,6 +149,14 @@ if __name__ == '__main__':
                     if (GPinput[0] == 310) and (GPinput[1] == 1):
                         strip.setColor(color = [50,200,50], color2 = [200,50,50])
                         strip.changeProgram(4) # change to Obduction
+                        
+                    if (GPinput[0] == 311) and (GPinput[1] == 1):
+                        strip.setColor(color =[50, 50, 50])
+                        strip.changeProgram(5) # change to strobe
+                        
+                    if (GPinput[0] == 313) and (GPinput[1] == 1):
+                        strip.setColor(color =[50, 50, 50])
+                        strip.changeProgram(6) # change to strobe
                     
                     
             strip.nextStep()

@@ -1,4 +1,5 @@
-repo and backup of my LED programs
+repository and backup of my LED programs
+
 
 Sources used:
 Bluetooth controller:
@@ -7,5 +8,15 @@ https://www.youtube.com/watch?v=F5-dV6ULeg8
 
 to start it with system start up via systemd:
 https://learn.sparkfun.com/tutorials/how-to-run-a-raspberry-pi-program-on-startup/all#method-3-systemd
+current issue: LEDSphere starts around 2min after the boot process is mostly finished. I don't understand why.
 
-current issue: LEDSphere starts around 2min after the boot process is mostly finished. I don't understand why. If you do, help is appreciated ;).
+RaspAP for RPi to act as a WiFi-Hotspot
+https://www.bitblokes.de/raspap-raspberry-pi-als-hotspot-access-point-wlan-wi-fi-benutzen/
+
+Wifi-lib for python
+
+
+
+Boot up:
+1) SphereLauncher
+

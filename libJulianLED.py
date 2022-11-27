@@ -52,6 +52,15 @@ class JLEDStripe:
         self._tObduct = 0
         self._iObduct = 0
         self._phaseObduct = 1
+        
+        # Strobe
+        self._tStrobe = 0
+        self._phaseStrobe = 1
+        
+        # Acceleration
+        self._tAcc = 0
+        self._iAcc = 0
+        self._phaseAcc = 0
 
     
     def nextStep(self):
@@ -81,6 +90,12 @@ class JLEDStripe:
             
             if self._program == 4:
                 self._obduction()
+                
+            if self._program == 5:
+                self._strobe()
+                
+            if self._program == 6:
+                self._acceleration()
             
             self._strip.show()
             
@@ -95,6 +110,8 @@ class JLEDStripe:
         # 2 - Puls ~~~ modes: 1 - breathing | 2 - color-color shift
         # 3 - Rain
         # 4 - Obduction
+        # 5 - Strobe
+        # 6 - Acceleration
         
         self._resetPrograms()
         
@@ -123,6 +140,12 @@ class JLEDStripe:
             
         if number == 4:
             print("Obduction - the aliens are taking you with them")
+        
+        if number == 5:
+            print("Strobe - I hope Juli won't get dizzy")
+            
+        if number == 6:
+            print("Acceleration - the visual drop")
     
     
     def setFreq(self, newFreq):
@@ -334,17 +357,22 @@ class JLEDStripe:
         deltaTime = 10 / self._freq
         
         if ((time.perf_counter() - self._tRain) > deltaTime):
+            if self._iRain >= 48:
+                self._iRain = 0
+            
             # Ring 0
             self._rainPattern(0, self._iRain)
             
-            # Ring 1
-            self._rainPattern(1, self._iRain)
-            
-            # Ring 2
-            self._rainPattern(2, self._iRain)
+            if self._iRain >= 10:
+                # Ring 1
+                self._rainPattern(1, self._iRain - 10)
+                
+                # Ring 2
+                self._rainPattern(2, self._iRain - 10)
             
             self._iRain += 1
             self._tRain = time.perf_counter()
+            
     
     def _obduction(self):
         # _phaseObduct 1: light is rising
@@ -407,20 +435,40 @@ class JLEDStripe:
                     # print("INFO - JulianLED - obduction - ring" + str(ring) + " pos: " + str(position))
                     
                     
-                    self._mirroredPattern(ring, position, inverted = True, factor = 1.0, factor2 = 0.0)
+                    self._mirroredPattern(ring, position, inverted = True, infinite = False, factor = 1.0, factor2 = 0.0)
                     if position >= 1:
-                        self._mirroredPattern(ring, position - 1, inverted = True, factor = 0.0, factor2 = 0.5)
+                        self._mirroredPattern(ring, position - 1, inverted = True, infinite = False, factor = 0.0, factor2 = 0.5)
                     if position >= 2:
-                        self._mirroredPattern(ring, position - 2, inverted = True, factor = 0.0, factor2 = 0.2)
+                        self._mirroredPattern(ring, position - 2, inverted = True, infinite = False, factor = 0.0, factor2 = 0.2)
                 
-                if self._iObduct >= 100:
+                if self._iObduct >= 104:
                     # ~ print("INFO - JulianLED - obduction - phase 1 finished, let's fizzle")
                     self._phaseObduct = 2
                     self._iObduct = 1
-                    self.shine(factor = 0.0, factor2 = 0.2)
                 
                 self._tObduct = time.perf_counter() 
                 self._iObduct += 1
+    
+    def _strobe(self):
+        if ((time.perf_counter() - self._tStrobe > 0.08) and (self._phaseStrobe == 0)):
+            self.shine()
+            self._phaseStrobe = 1
+            self._tStrobe = time.perf_counter()
+        else:
+            self.shine(factor = 0)
+            self._phaseStrobe = 0
+        
+    def _acceleration(self):
+        
+        if((time.perf_counter() - self._tAcc) > 0.1):
+            # RING 0
+            self._accStrip(0, self._iAcc)
+            
+            # RING 1
+            self._accStrip(1, self._iAcc)
+            
+            # RING 2
+            self._accStrip(2, self._iAcc)
     
     
     # ~ ~ ~ ~ ~ ~ effects ~ ~ ~ ~ ~ ~
@@ -551,6 +599,15 @@ class JLEDStripe:
         self._iObduct = 0
         self._phaseObduct = 1
         
+        # Strobe
+        self._tStrobe = 0
+        self._phaseStrobe = 1
+        
+        # Acceleration
+        self._tAcc = 0
+        self._iAcc = 0
+        self._phaseAcc = 0
+        
         
     def _tailedDot(self, ring, position):            
         self.shine(ring = ring, position = self._checkImLED(ring, position - 3), factor = 0, factor2 = 0)
@@ -568,31 +625,36 @@ class JLEDStripe:
         
     def _rainPattern(self, ring, rainPos):
         # pattern: 1 - 0 - 1 - 0 - 1/2 - 0
-        self._mirroredPattern(ring, rainPos, factor = 1.0)
-        self._mirroredPattern(ring, rainPos - 1, factor = 0.0)
-        self._mirroredPattern(ring, rainPos - 2, factor = 0.1)
-        self._mirroredPattern(ring, rainPos - 3, factor = 0.0)
-        self._mirroredPattern(ring, rainPos - 4, factor = 0.05)
-        self._mirroredPattern(ring, rainPos - 5, factor = 0.0)
+        self._mirroredPattern(ring, rainPos, infinite = False, factor = 1.0)
+        self._mirroredPattern(ring, rainPos - 1, infinite = False, factor = 0.0)
+        self._mirroredPattern(ring, rainPos - 2, infinite = False, factor = 0.1)
+        self._mirroredPattern(ring, rainPos - 3, infinite = False, factor = 0.0)
+        self._mirroredPattern(ring, rainPos - 4, infinite = False, factor = 0.05)
+        self._mirroredPattern(ring, rainPos - 5, infinite = False, factor = 0.0)
     
-    def _mirroredPattern(self, ring, sidePos, inverted = False, factor = 1, factor2 = 0):
+    def _mirroredPattern(self, ring, sidePos, inverted = False, infinite = True, factor = 1, factor2 = 0):
         # input: ring = number of ring
         #        sidePos = position on ring counting from the top LED downwards to the buttom LED on both sides of the ring
         #          [0, x]
         #        inverted = False >> LEDs are counted from top to buttom, inverted = True >> LEDs are counted from buttom to top
+        #        infinite = True >> if sidePos > maxPosHalfRing, position will start automatically from the top again, 
+        #                   False >> if sidePos > maxPosHalfRing, signal will be ignored
         #        factor and factor2 will be just copied to shine()
         # output: command shine on both sides of the ring, so that the animation is mirrored relative to the vertical axis of the ring
         
         maxPosHalfRing = int(self._LED_COUNT[ring] / 2) # if the ring is parted in two halves they would be indexed from 0 to maxPosHalfRing
         
-        if inverted:
+        if (not infinite) and ((sidePos < 0) or (sidePos >= maxPosHalfRing)):
+            sidePos = -5000
+        
+        if (inverted) and (sidePos != -5000):
             position1 = self._TOP_LED[ring] + maxPosHalfRing + sidePos % maxPosHalfRing
             self.shine(ring = ring, position = position1, factor = factor, factor2 = factor2)
             
             position2 = self._TOP_LED[ring] + maxPosHalfRing - 1 - sidePos % maxPosHalfRing
             self.shine(ring = ring, position = position2, factor = factor, factor2 = factor2)
             
-        else:
+        elif (sidePos != -5000):
             position1 = self._TOP_LED[ring] + sidePos % maxPosHalfRing
             self.shine(ring = ring, position = position1, factor = factor, factor2 = factor2)
             
@@ -612,3 +674,16 @@ class JLEDStripe:
             position = int(random.random()*self._LED_COUNT[ring])
             self.shine(ring = ring, position = position, factor = 0, factor2 = 0)
             
+
+    def _accStrip (self, ring, position):
+        self.shine(ring = ring, position = self._checkImLED(ring, position - 3), factor = 0)
+        
+        self.shine(ring = ring, position = self._checkImLED(ring, position))
+        self.shine(ring = ring, position = self._checkImLED(ring, position - 1))
+        self.shine(ring = ring, position = self._checkImLED(ring, position - 2))
+        
+        self.shine(ring = ring, position = self._checkImLED(ring, position - 3 + self._LEDCOUNT[ring]/2), factor = 0)
+        
+        self.shine(ring = ring, position = self._checkImLED(ring, position + self._LEDCOUNT[ring]/2))
+        self.shine(ring = ring, position = self._checkImLED(ring, position - 1 + self._LEDCOUNT[ring]/2))
+        self.shine(ring = ring, position = self._checkImLED(ring, position - 2 + self._LEDCOUNT[ring]/2))
